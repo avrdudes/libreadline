@@ -225,17 +225,17 @@ expand_prompt (pmt, lp, lip, niflp, vlp)
     {
       r = savestring (pmt);
       if (lp)
-	*lp = strlen (r);
+	*lp = (int)strlen (r);
       if (lip)
 	*lip = 0;
       if (niflp)
 	*niflp = 0;
       if (vlp)
-	*vlp = lp ? *lp : strlen (r);
+	*vlp = lp ? *lp : (int)strlen (r);
       return r;
     }
 
-  l = strlen (pmt);
+  l = (int)strlen (pmt);
   r = ret = (char *)xmalloc (l + 1);
 
   invfl = 0;	/* invisible chars in first line of prompt */
@@ -252,7 +252,7 @@ expand_prompt (pmt, lp, lip, niflp, vlp)
       else if (ignoring && *p == RL_PROMPT_END_IGNORE)
 	{
 	  ignoring = 0;
-	  last = r - ret - 1;
+	  last = (int)(r - ret) - 1;
 	  continue;
 	}
       else
@@ -485,9 +485,9 @@ rl_redisplay ()
      number of non-visible characters in the prompt string. */
   if (rl_display_prompt == rl_prompt || local_prompt)
     {
-      int local_len = local_prompt ? strlen (local_prompt) : 0;
+      int local_len = local_prompt ? (int)strlen (local_prompt) : 0;
       if (local_prompt_prefix && forced_display)
-	_rl_output_some_chars (local_prompt_prefix, strlen (local_prompt_prefix));
+	_rl_output_some_chars (local_prompt_prefix, (int)strlen (local_prompt_prefix));
 
       if (local_len > 0)
 	{
@@ -513,7 +513,7 @@ rl_redisplay ()
       else
 	{
 	  prompt_this_line++;
-	  pmtlen = prompt_this_line - rl_display_prompt;	/* temp var */
+	  pmtlen = (int)(prompt_this_line - rl_display_prompt);	/* temp var */
 	  if (forced_display)
 	    {
 	      _rl_output_some_chars (rl_display_prompt, pmtlen);
@@ -524,7 +524,7 @@ rl_redisplay ()
 	    }
 	}
 
-      prompt_physical_chars = pmtlen = strlen (prompt_this_line);
+      prompt_physical_chars = pmtlen = (int)strlen (prompt_this_line);
       temp = pmtlen + out + 2;
       if (temp >= line_size)
 	{
@@ -890,7 +890,7 @@ rl_redisplay ()
 		  _rl_move_vert (linenum);
 		  _rl_move_cursor_relative (0, tt);
 		  _rl_clear_to_eol
-		    ((linenum == _rl_vis_botlin) ? strlen (tt) : _rl_screenwidth);
+		    ((linenum == _rl_vis_botlin) ? (int)strlen (tt) : _rl_screenwidth);
 		}
 	    }
 	  _rl_vis_botlin = inv_botlin;
@@ -1228,8 +1228,8 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
   /* Move to the end of the screen line.  ND and OD are used to keep track
      of the distance between ne and new and oe and old, respectively, to
      move a subtraction out of each loop. */
-  for (od = ofd - old, oe = ofd; od < omax && *oe; oe++, od++);
-  for (nd = nfd - new, ne = nfd; nd < nmax && *ne; ne++, nd++);
+  for (od = (int)(ofd - old), oe = ofd; od < omax && *oe; oe++, od++);
+  for (nd = (int)(nfd - new), ne = nfd; nd < nmax && *ne; ne++, nd++);
 
   /* If no difference, continue to next line. */
   if (ofd == oe && nfd == ne)
@@ -1330,8 +1330,8 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
      sequences (like drawing the `unbold' sequence without a corresponding
      `bold') that manifests itself on certain terminals. */
 
-  lendiff = local_prompt ? strlen (local_prompt) : 0;
-  od = ofd - old;	/* index of first difference in visible line */
+  lendiff = local_prompt ? (int)strlen (local_prompt) : 0;
+  od = (int)(ofd - old);	/* index of first difference in visible line */
   if (current_line == 0 && !_rl_horizontal_scroll_mode &&
       _rl_term_cr && lendiff > prompt_visible_length && _rl_last_c_pos > 0 &&
       od >= lendiff && _rl_last_c_pos <= prompt_last_invisible)
@@ -1354,9 +1354,9 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
      lendiff == difference in buffer
      col_lendiff == difference on screen
      When not using multibyte characters, these are equal */
-  lendiff = (nls - nfd) - (ols - ofd);
+  lendiff = (int)(nls - nfd) - (int)(ols - ofd);
   if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)
-    col_lendiff = _rl_col_width (new, nfd - new, nls - new) - _rl_col_width (old, ofd - old, ols - old);
+    col_lendiff = _rl_col_width (new, (int)(nfd - new), (int)(nls - new)) - _rl_col_width (old, (int)(ofd - old), (int)(ols - old));
   else
     col_lendiff = lendiff;
 
@@ -1379,9 +1379,9 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
     }
 
   /* Insert (diff (len (old), len (new)) ch. */
-  temp = ne - nfd;
+  temp = (int)(ne - nfd);
   if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)
-    col_temp = _rl_col_width (new, nfd - new, ne - new);
+    col_temp = _rl_col_width (new, (int)(nfd - new), (int)(ne - new));
   else
     col_temp = temp;
 
@@ -1481,9 +1481,9 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
 	      _rl_output_some_chars (nfd, temp);
 	      _rl_last_c_pos += col_temp;
 	    }
-	  lendiff = (oe - old) - (ne - new);
+	  lendiff = (int)(oe - old) - (int)(ne - new);
 	  if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)
-	    col_lendiff = _rl_col_width (old, 0, oe - old) - _rl_col_width (new, 0, ne - new);
+	    col_lendiff = _rl_col_width (old, 0, (int)(oe - old)) - _rl_col_width (new, 0, (int)(ne - new));
 	  else
 	    col_lendiff = lendiff;
 
@@ -1525,7 +1525,7 @@ rl_on_new_line_with_prompt ()
 
   /* Initialize visible_line and invisible_line to ensure that they can hold
      the already-displayed prompt. */
-  prompt_size = strlen (rl_prompt) + 1;
+  prompt_size = (int)strlen (rl_prompt) + 1;
   init_line_structures (prompt_size);
 
   /* Make sure the line structures hold the already-displayed prompt for
@@ -1539,7 +1539,7 @@ rl_on_new_line_with_prompt ()
   if (!prompt_last_line)
     prompt_last_line = rl_prompt;
 
-  l = strlen (prompt_last_line);
+  l = (int)strlen (prompt_last_line);
   if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)
     _rl_last_c_pos = _rl_col_width (prompt_last_line, 0, l);
   else
@@ -1929,7 +1929,7 @@ char *
 _rl_make_prompt_for_search (pchar)
      int pchar;
 {
-  int len;
+  size_t len;
   char *pmt;
 
   rl_save_prompt ();

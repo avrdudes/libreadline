@@ -754,7 +754,7 @@ _rl_read_file (filename, sizep)
 
   /* Read the file into BUFFER. */
   buffer = (char *)xmalloc (file_size + 1);
-  i = read (file, buffer, file_size);
+  i = read (file, buffer, (int)file_size);
   close (file);
 
   if (i < 0)
@@ -1303,7 +1303,7 @@ rl_parse_and_bind (string)
       /* Binding macro? */
       if (*funname == '\'' || *funname == '"')
 	{
-	  j = strlen (funname);
+	  j = (int)strlen (funname);
 
 	  /* Remove the delimiting quotes from each end of FUNNAME. */
 	  if (j && funname[j - 1] == *funname)
@@ -1338,7 +1338,7 @@ rl_parse_and_bind (string)
   if (*funname == '\'' || *funname == '"')
     {
       char useq[2];
-      int fl = strlen (funname);
+      size_t fl = strlen (funname);
 
       useq[0] = key; useq[1] = '\0';
       if (fl && funname[fl - 1] == *funname)
@@ -2063,7 +2063,7 @@ _rl_macro_dumper_internal (print_readably, map, prefix)
 {
   register int key;
   char *keyname, *out;
-  int prefix_len;
+  size_t prefix_len;
 
   for (key = 0; key < KEYMAP_SIZE; key++)
     {

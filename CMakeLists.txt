@@ -50,6 +50,4 @@ target_compile_definitions(libreadline PRIVATE
 if(MSVC)
     target_compile_definitions(libreadline PRIVATE _CRT_NONSTDC_NO_WARNINGS=1 _CRT_SECURE_NO_WARNINGS=1)
     target_include_directories(libreadline PUBLIC src/msvc)
-    target_compile_options(libreadline PRIVATE /wd4244) # warning C4244: '=': conversion from 'xxx' to 'xxx', possible loss of data
-    target_compile_options(libreadline PRIVATE /wd4267) # warning C4267: 'function': conversion from 'xxx' to 'xxx', possible loss of data
 endif()

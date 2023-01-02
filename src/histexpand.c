@@ -730,7 +730,7 @@ history_expand_internal (string, start, end_index_ptr, ret_string, current_line)
 		    if (search_string && *search_string)
 		      {
 			subst_lhs = savestring (search_string);
-			subst_lhs_len = strlen (subst_lhs);
+			subst_lhs_len = (int)strlen (subst_lhs);
 		      }
 		    else
 		      {
@@ -759,7 +759,7 @@ history_expand_internal (string, start, end_index_ptr, ret_string, current_line)
 		return -1;
 	      }
 
-	    l_temp = strlen (temp);
+	    l_temp = (int)strlen (temp);
 	    /* Ignore impossible cases. */
 	    if (subst_lhs_len > l_temp)
 	      {
@@ -817,14 +817,14 @@ history_expand_internal (string, start, end_index_ptr, ret_string, current_line)
 			   other match when matching a single character.  Was
 			   si += subst_rhs_len previously. */
 			si += subst_rhs_len - 1;
-			l_temp = strlen (temp);
+			l_temp = (int)strlen (temp);
 			substitute_globally++;
 			continue;
 		      }
 		    else if (subst_bywords)
 		      {
 			si = we;
-			l_temp = strlen (temp);
+			l_temp = (int)strlen (temp);
 			continue;
 		      }
 		    else
@@ -868,7 +868,7 @@ history_expand_internal (string, start, end_index_ptr, ret_string, current_line)
       temp = x;
     }
 
-  n = strlen (temp);
+  n = (int)strlen (temp);
   if (n >= result_len)
     result = (char *)xrealloc (result, n + 2);
   strcpy (result, temp);
@@ -895,7 +895,7 @@ history_expand_internal (string, start, end_index_ptr, ret_string, current_line)
 #define ADD_STRING(s) \
 	do \
 	  { \
-	    int sl = strlen (s); \
+	    int sl = (int)strlen (s); \
 	    j += sl; \
 	    if (j >= result_len) \
 	      { \
@@ -954,7 +954,7 @@ history_expand (hstring, output)
   result[0] = '\0';
 
   only_printing = modified = 0;
-  l = strlen (hstring);
+  l = (int)strlen (hstring);
 
   /* Grovel the string.  Only backslash and single quotes can quote the
      history escape character.  We also handle arg specifiers. */
@@ -1349,7 +1349,7 @@ history_arg_extract (first, last, string)
 {
   register int i, len;
   char *result;
-  int size, offset;
+  size_t size, offset;
   char **list;
 
   /* XXX - think about making history_tokenize return a struct array,

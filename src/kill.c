@@ -531,7 +531,7 @@ rl_yank_pop (count, key)
       return -1;
     }
 
-  l = strlen (rl_kill_ring[rl_kill_index]);
+  l = (int)strlen (rl_kill_ring[rl_kill_index]);
   n = rl_point - l;
   if (n >= 0 && STREQN (rl_line_buffer + n, rl_kill_ring[rl_kill_index], l))
     {
@@ -664,7 +664,7 @@ rl_paste_from_clipboard (count, key)
      int count, key;
 {
   char *data, *ptr;
-  int len;
+  size_t len;
 
   if (OpenClipboard (NULL) == 0)
     return (0);

@@ -122,7 +122,7 @@ history_filename (filename)
 {
   char *return_val;
   const char *home;
-  int home_len;
+  size_t home_len;
 
   return_val = filename ? savestring (filename) : (char *)NULL;
 
@@ -224,7 +224,7 @@ read_history_range (filename, from, to)
       goto error_and_exit;
     }
 
-  chars_read = read (file, buffer, file_size);
+  chars_read = read (file, buffer, (int)file_size);
 #endif
   if (chars_read < 0)
     {
@@ -369,7 +369,7 @@ history_truncate_file (fname, lines)
       goto truncate_exit;
     }
 
-  chars_read = read (file, buffer, file_size);
+  chars_read = read (file, buffer, (int)file_size);
   close (file);
 
   if (chars_read <= 0)
@@ -408,7 +408,7 @@ history_truncate_file (fname, lines)
      truncate to. */
   if (bp > buffer && ((file = open (filename, O_WRONLY|O_TRUNC|O_BINARY, 0600)) != -1))
     {
-      write (file, bp, chars_read - (bp - buffer));
+      write (file, bp, chars_read - (int)(bp - buffer));
 
 #if defined (__BEOS__)
       /* BeOS ignores O_TRUNC. */
@@ -464,8 +464,8 @@ history_do_write (filename, nelements, overwrite)
      Suggested by Peter Ho (peter@robosts.oxford.ac.uk). */
   {
     HIST_ENTRY **the_history;	/* local */
-    register int j;
-    int buffer_size;
+    register size_t j;
+    size_t buffer_size;
     char *buffer;
 
     the_history = history_list ();
@@ -522,7 +522,7 @@ mmap_error:
     if (msync (buffer, buffer_size, 0) != 0 || munmap (buffer, buffer_size) != 0)
       rv = errno;
 #else
-    if (write (file, buffer, buffer_size) < 0)
+    if (write (file, buffer, (int)buffer_size) < 0)
       rv = errno;
     free (buffer);
 #endif

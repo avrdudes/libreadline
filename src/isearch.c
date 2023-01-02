@@ -101,7 +101,7 @@ rl_display_search (search_string, reverse_p, where)
      int reverse_p, where;
 {
   char *message;
-  int msglen, searchlen;
+  size_t msglen, searchlen;
 
   searchlen = (search_string && *search_string) ? strlen (search_string) : 0;
 
@@ -240,7 +240,7 @@ rl_search_history (direction, invoking_key)
   rl_display_search (search_string, reverse, -1);
 
   sline = rl_line_buffer;
-  sline_len = strlen (sline);
+  sline_len = (int)strlen (sline);
   line_index = rl_point;
 
   found = failed = 0;
@@ -480,7 +480,7 @@ rl_search_history (direction, invoking_key)
 
 	      /* We will need these later. */
 	      sline = lines[i];
-	      sline_len = strlen (sline);
+	      sline_len = (int)strlen (sline);
 	    }
 	  while ((prev_line_found && STREQ (prev_line_found, lines[i])) ||
 		 (search_string_index > sline_len));
@@ -541,7 +541,7 @@ rl_search_history (direction, invoking_key)
       if (last_found_line == orig_line)
 	line_index = orig_point;
       else
-	line_index = strlen (rl_line_buffer);
+	line_index = (int)strlen (rl_line_buffer);
       rl_mark = orig_mark;
     }
 

@@ -86,7 +86,7 @@ history_search_internal (string, direction, anchored)
 #define NEXT_LINE() do { if (reverse) i--; else i++; } while (0)
 
   the_history = history_list ();
-  string_len = strlen (string);
+  string_len = (int)strlen (string);
   while (1)
     {
       /* Search each line in the history list for STRING. */
@@ -96,7 +96,7 @@ history_search_internal (string, direction, anchored)
 	return (-1);
 
       line = the_history[i]->line;
-      line_index = strlen (line);
+      line_index = (int)strlen (line);
 
       /* If STRING is longer than line, no match. */
       if (string_len > line_index)

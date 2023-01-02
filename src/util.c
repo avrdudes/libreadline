@@ -215,7 +215,7 @@ char *
 _rl_strindex (s1, s2)
      register const char *s1, *s2;
 {
-  register int i, l, len;
+  register ptrdiff_t i, l, len;
 
   for (i = 0, l = strlen (s2), len = strlen (s1); (len - i) >= l; i++)
     if (_rl_strnicmp (s1 + i, s2, l) == 0)

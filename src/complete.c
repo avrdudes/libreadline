@@ -690,7 +690,8 @@ static int
 print_filename (to_print, full_pathname)
      char *to_print, *full_pathname;
 {
-  int printed_len, extension_char, slen, tlen;
+  int printed_len, extension_char;
+  size_t slen, tlen;
   char *s, c, *new_full_pathname;
 
   extension_char = 0;
@@ -1166,7 +1167,7 @@ compute_lcd_of_matches (match_list, matches, text)
 	  /* sort the list to get consistent answers. */
 	  qsort (match_list+1, matches, sizeof(char *), (QSFUNC *)_rl_qsort_string_compare);
 
-	  si = strlen (text);
+	  si = (int)strlen (text);
 	  if (si <= low)
 	    {
 	      for (i = 1; i <= matches; i++)
@@ -1846,7 +1847,8 @@ rl_username_completion_function (text, state)
   char user_name[128];
   unsigned user_len;
 #endif
-  static int namelen, first_char, first_char_loc;
+  static size_t namelen;
+  static int first_char, first_char_loc;
   char *value;
 
   if (state == 0)
@@ -1929,9 +1931,9 @@ rl_filename_completion_function (text, state)
   static char *filename = (char *)NULL;
   static char *dirname = (char *)NULL;
   static char *users_dirname = (char *)NULL;
-  static int filename_len;
+  static size_t filename_len;
   char *temp;
-  int dirlen;
+  size_t dirlen;
 
   /* If we don't have any state, then do some initialization. */
   if (state == 0)

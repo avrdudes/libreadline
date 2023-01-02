@@ -133,7 +133,7 @@ tilde_find_prefix (string, len)
 
   prefixes = tilde_additional_prefixes;
 
-  string_len = strlen (string);
+  string_len = (int)strlen (string);
   *len = 0;
 
   if (*string == '\0' || *string == '~')
@@ -147,7 +147,7 @@ tilde_find_prefix (string, len)
 	    {
 	      if (strncmp (string + i, prefixes[j], strlen (prefixes[j])) == 0)
 		{
-		  *len = strlen (prefixes[j]) - 1;
+		  *len = (int)strlen (prefixes[j]) - 1;
 		  return (i + *len);
 		}
 	    }
@@ -166,7 +166,7 @@ tilde_find_suffix (string)
   register char **suffixes;
 
   suffixes = tilde_additional_suffixes;
-  string_len = strlen (string);
+  string_len = (int)strlen (string);
 
   for (i = 0; i < string_len; i++)
     {
@@ -196,9 +196,9 @@ tilde_expand (string)
 
   result_index = result_size = 0;
   if (result = strchr (string, '~'))
-    result = (char *)xmalloc (result_size = (strlen (string) + 16));
+    result = (char *)xmalloc (result_size = (int)(strlen (string) + 16));
   else
-    result = (char *)xmalloc (result_size = (strlen (string) + 1));
+    result = (char *)xmalloc (result_size = (int)(strlen (string) + 1));
 
   /* Scan through STRING expanding tildes as we come to them. */
   while (1)
@@ -237,7 +237,7 @@ tilde_expand (string)
       expansion = tilde_expand_word (tilde_word);
       free (tilde_word);
 
-      len = strlen (expansion);
+      len = (int)strlen (expansion);
 #ifdef __CYGWIN__
       /* Fix for Cygwin to prevent ~user/xxx from expanding to //xxx when
 	 $HOME for `user' is /.  On cygwin, // denotes a network drive. */
@@ -291,7 +291,7 @@ glue_prefix_and_suffix (prefix, suffix, suffind)
      int suffind;
 {
   char *ret;
-  int plen, slen;
+  size_t plen, slen;
 
   plen = (prefix && *prefix) ? strlen (prefix) : 0;
   slen = strlen (suffix + suffind);

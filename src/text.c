@@ -77,7 +77,7 @@ rl_insert_text (string)
 {
   register int i, l;
 
-  l = (string && *string) ? strlen (string) : 0;
+  l = (string && *string) ? (int)strlen (string) : 0;
   if (l == 0)
     return 0;
 
@@ -198,7 +198,7 @@ rl_replace_line (text, clear_undo)
 {
   int len;
 
-  len = strlen (text);
+  len = (int)strlen (text);
   if (len >= rl_line_buffer_len)
     rl_extend_line_buffer (len);
   strcpy (rl_line_buffer, text);
@@ -1149,7 +1149,7 @@ rl_insert_comment (count, key)
     rl_insert_text (rl_comment_text);
   else
     {
-      rl_comment_len = strlen (rl_comment_text);
+      rl_comment_len = (int)strlen (rl_comment_text);
       if (STREQN (rl_comment_text, rl_line_buffer, rl_comment_len))
 	rl_delete_text (rl_point, rl_point + rl_comment_len);
       else
