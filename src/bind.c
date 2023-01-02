@@ -910,7 +910,7 @@ _rl_init_file_error (msg)
 /*								    */
 /* **************************************************************** */
 
-typedef int _rl_parser_func_t PARAMS((char *));
+typedef int _rl_parser_func_t(char *);
 
 /* Things that mean `Control'. */
 const char *_rl_possible_control_prefixes[] = {
@@ -934,8 +934,7 @@ static int if_stack_size;
 /* Push _rl_parsing_conditionalized_out, and set parser state based
    on ARGS. */
 static int
-parser_if (args)
-     char *args;
+parser_if (char* args)
 {
   register int i;
 
@@ -1007,8 +1006,7 @@ parser_if (args)
 
 /* Invert the current parser state if there is anything on the stack. */
 static int
-parser_else (args)
-     char *args;
+parser_else (char* args)
 {
   register int i;
 
@@ -1038,8 +1036,7 @@ parser_else (args)
 /* Terminate a conditional, popping the value of
    _rl_parsing_conditionalized_out from the stack. */
 static int
-parser_endif (args)
-     char *args;
+parser_endif (char* args)
 {
   if (if_stack_depth)
     _rl_parsing_conditionalized_out = if_stack[--if_stack_depth];
@@ -1049,8 +1046,7 @@ parser_endif (args)
 }
 
 static int
-parser_include (args)
-     char *args;
+parser_include (char* args)
 {
   const char *old_init_file;
   char *e;

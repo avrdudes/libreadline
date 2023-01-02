@@ -42,6 +42,13 @@ add_library(libreadline STATIC
     src/text.c
     )
 
+target_include_directories(libreadline
+    PUBLIC
+    include
+    PRIVATE
+    include/readline
+    )
+
 target_compile_definitions(libreadline PRIVATE
     HAVE_CONFIG_H=1
     READLINE_STATIC=1
@@ -49,5 +56,5 @@ target_compile_definitions(libreadline PRIVATE
 
 if(MSVC)
     target_compile_definitions(libreadline PRIVATE _CRT_NONSTDC_NO_WARNINGS=1 _CRT_SECURE_NO_WARNINGS=1)
-    target_include_directories(libreadline PUBLIC src/msvc)
+    target_include_directories(libreadline PRIVATE src/msvc)
 endif()

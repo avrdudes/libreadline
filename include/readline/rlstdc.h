@@ -29,7 +29,7 @@
 	extern char *func PARAMS((char *, char *, int)); */
 
 #if !defined (PARAMS)
-#  if defined (__STDC__) || defined (__GNUC__) || defined (__cplusplus)
+#  if defined (__STDC__) || defined (__GNUC__) || defined (__cplusplus) || (defined _WIN32)
 #    define PARAMS(protos) protos
 #  else
 #    define PARAMS(protos) ()
@@ -58,9 +58,9 @@
 # elif defined (USE_READLINE_DLL)
 #  define READLINE_DLL_IMPEXP     __DLL_IMPORT__
 # elif defined (USE_READLINE_STATIC)
-#  define READLINE_DLL_IMPEXP      
-# else /* assume USE_READLINE_DLL */
-#  define READLINE_DLL_IMPEXP     __DLL_IMPORT__
+#  define READLINE_DLL_IMPEXP     extern
+# else /* assume USE_READLINE_STATIC */
+#  define READLINE_DLL_IMPEXP     extern
 # endif
 #else /* __WIN32__ */
 # define READLINE_DLL_IMPEXP  

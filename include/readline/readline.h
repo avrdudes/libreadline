@@ -27,30 +27,6 @@
 extern "C" {
 #endif
 
-#ifndef __GNUC__
-# define __DLL_IMPORT__  __declspec(dllimport)
-# define __DLL_EXPORT__  __declspec(dllexport)
-#else
-# define __DLL_IMPORT__  __attribute__((dllimport)) extern
-# define __DLL_EXPORT__  __attribute__((dllexport)) extern
-#endif 
-
-#if (defined __WIN32__) || (defined _WIN32)
-# ifdef BUILD_READLINE_DLL
-#  define READLINE_DLL_IMPEXP     __DLL_EXPORT__
-# elif defined(READLINE_STATIC)
-#  define READLINE_DLL_IMPEXP     extern
-# elif defined (USE_READLINE_DLL)
-#  define READLINE_DLL_IMPEXP     __DLL_IMPORT__
-# elif defined (USE_READLINE_STATIC)
-#  define READLINE_DLL_IMPEXP      
-# else /* assume USE_READLINE_DLL */
-#  define READLINE_DLL_IMPEXP     __DLL_IMPORT__
-# endif
-#else /* __WIN32__ */
-# define READLINE_DLL_IMPEXP  
-#endif
-
 #if defined (READLINE_LIBRARY)
 #  include "rlstdc.h"
 #  include "rltypedefs.h"
