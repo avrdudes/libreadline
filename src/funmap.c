@@ -40,7 +40,7 @@
 
 #include "xmalloc.h"
 
-#ifdef __STDC__
+#if defined (__STDC__) || defined (_WIN32)
 typedef int QSFUNC (const void *, const void *);
 #else
 typedef int QSFUNC ();

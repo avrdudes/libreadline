@@ -44,6 +44,7 @@
 #include <stdio.h>
 
 #ifdef _WIN32
+# define WIN32_LEAN_AND_MEAN 1
 # include <windows.h>
 # include <io.h>
 #endif
@@ -69,7 +70,7 @@ extern int errno;
 #include "xmalloc.h"
 #include "rlprivate.h"
 
-#ifdef __STDC__
+#if defined (__STDC__) || defined (_WIN32)
 typedef int QSFUNC (const void *, const void *);
 #else
 typedef int QSFUNC ();
@@ -1891,7 +1892,7 @@ rl_username_completion_function (text, state)
 #else /* _WIN32 */
   if (GetUserName (user_name, &user_len))
     {
-      if (namelen == 0 || (!strnicmp (username, user_name, name_len)))
+      if (namelen == 0 || (!strnicmp (username, user_name, namelen)))
 	{
 	  value = (char *)xmalloc (2 + strlen (user_name));
 	  *value = *text;

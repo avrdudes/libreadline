@@ -67,7 +67,7 @@ extern COORD rlScreenEnd;
 extern int rlScreenMax;
 #endif /* _WIN32 */
 
-#if !defined (strchr) && !defined (__STDC__)
+#if !defined (strchr) && !defined (__STDC__) && !defined (_WIN32)
 extern char *strchr (), *strrchr ();
 #endif /* !strchr && !__STDC__ */
 
@@ -218,7 +218,7 @@ expand_prompt (pmt, lp, lip, niflp, vlp)
      int *lp, *lip, *niflp, *vlp;
 {
   char *r, *ret, *p;
-  int l, rl, last, ignoring, ninvis, invfl, ind, pind, physchars;
+  int l, rl, last, ignoring, ninvis, invfl, physchars;
 
   /* Short-circuit if we can. */
   if ((MB_CUR_MAX <= 1 || rl_byte_oriented) && strchr (pmt, RL_PROMPT_START_IGNORE) == 0)
@@ -258,6 +258,7 @@ expand_prompt (pmt, lp, lip, niflp, vlp)
       else
 	{
 #if defined (HANDLE_MULTIBYTE)
+	  int ind, pind;
 	  if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)
 	    {
 	      pind = p - pmt;

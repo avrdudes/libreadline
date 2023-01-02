@@ -71,7 +71,7 @@ extern int errno;
 #include "rlshell.h"
 #include "xmalloc.h"
 
-#if !defined (strchr) && !defined (__STDC__)
+#if !defined (strchr) && !defined (__STDC__) && !defined (_WIN32)
 extern char *strchr (), *strrchr ();
 #endif /* !strchr && !__STDC__ */
 

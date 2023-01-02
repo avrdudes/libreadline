@@ -258,7 +258,7 @@ _rl_strpbrk (string1, string2)
 }
 #endif
 
-#if !defined (HAVE_STRCASECMP)
+#if !defined (HAVE_STRCASECMP) && !defined (_WIN32)
 /* Compare at most COUNT characters from string1 to string2.  Case
    doesn't matter. */
 int

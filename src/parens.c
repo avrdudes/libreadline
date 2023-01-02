@@ -43,6 +43,7 @@
 #endif
 
 #ifdef _WIN32
+# define WIN32_LEAN_AND_MEAN 1
 # include <windows.h>
 #endif
 
@@ -59,7 +60,7 @@
 #  include <strings.h>
 #endif /* !HAVE_STRING_H */
 
-#if !defined (strchr) && !defined (__STDC__)
+#if !defined (strchr) && !defined (__STDC__) && !defined (_WIN32)
 extern char *strchr (), *strrchr ();
 #endif /* !strchr && !__STDC__ */
 

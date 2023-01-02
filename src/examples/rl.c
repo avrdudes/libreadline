@@ -44,7 +44,7 @@
 extern int optind;
 extern char *optarg;
 
-#if !defined (strchr) && !defined (__STDC__)
+#if !defined (strchr) && !defined (__STDC__) && !defined (_WIN32)
 extern char *strrchr();
 #endif
 

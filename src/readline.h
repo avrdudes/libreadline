@@ -39,7 +39,7 @@ extern "C" {
 # ifdef BUILD_READLINE_DLL
 #  define READLINE_DLL_IMPEXP     __DLL_EXPORT__
 # elif defined(READLINE_STATIC)
-#  define READLINE_DLL_IMPEXP      
+#  define READLINE_DLL_IMPEXP     extern
 # elif defined (USE_READLINE_DLL)
 #  define READLINE_DLL_IMPEXP     __DLL_IMPORT__
 # elif defined (USE_READLINE_STATIC)
