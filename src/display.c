@@ -41,6 +41,10 @@
 
 #include <stdio.h>
 
+#ifdef __MSDOS__
+# include <pc.h>
+#endif
+
 /* System-specific feature definitions and include files. */
 #include "rldefs.h"
 #include "rlmbutil.h"
@@ -55,6 +59,14 @@
 #include "rlprivate.h"
 #include "xmalloc.h"
 
+#if defined (_WIN32)
+#include <windows.h>
+extern int haveConsole;
+extern HANDLE hStdout, hStdin;
+extern COORD rlScreenEnd;
+extern int rlScreenMax;
+#endif /* _WIN32 */
+
 #if !defined (strchr) && !defined (__STDC__)
 extern char *strchr (), *strrchr ();
 #endif /* !strchr && !__STDC__ */
@@ -68,6 +80,11 @@ static void space_to_eol PARAMS((int));
 static void delete_chars PARAMS((int));
 static void insert_some_chars PARAMS((char *, int, int));
 static void cr PARAMS((void));
+
+#ifdef _WIN32
+# define putc(ch, stream) \
+if ((ch) == '\r') cr (); else _rl_output_character_function (ch)
+#endif
 
 #if defined (HANDLE_MULTIBYTE)
 static int _rl_col_width PARAMS((const char *, int, int));
@@ -900,7 +917,7 @@ rl_redisplay ()
 	  if (cursor_linenum == 0 && wrap_offset > 0 && _rl_last_c_pos > 0 &&
 	      _rl_last_c_pos <= prompt_last_invisible && local_prompt)
 	    {
-#if defined (__MSDOS__)
+#if defined (__MSDOS__) || defined (_WIN32)
 	      putc ('\r', rl_outstream);
 #else
 	      if (_rl_term_cr)
@@ -1318,7 +1335,7 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
       _rl_term_cr && lendiff > prompt_visible_length && _rl_last_c_pos > 0 &&
       od >= lendiff && _rl_last_c_pos <= prompt_last_invisible)
     {
-#if defined (__MSDOS__)
+#if defined (__MSDOS__) || defined (_WIN32)
       putc ('\r', rl_outstream);
 #else
       tputs (_rl_term_cr, 1, _rl_output_character_function);
@@ -1369,6 +1386,7 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
 
   if (col_lendiff > 0)	/* XXX - was lendiff */
     {
+#ifndef _WIN32
       /* Non-zero if we're increasing the number of lines. */
       int gl = current_line >= _rl_vis_botlin && inv_botlin > _rl_vis_botlin;
       /* Sometimes it is cheaper to print the characters rather than
@@ -1422,6 +1440,7 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
 	    }
 	}
       else
+#endif /* !_WIN32 */
 	{
 	  /* cannot insert chars, write to EOL */
 	  _rl_output_some_chars (nfd, temp);
@@ -1430,6 +1449,7 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
     }
   else				/* Delete characters from line. */
     {
+#ifndef _WIN32
       /* If possible and inexpensive to use terminal deletion, then do so. */
       if (_rl_term_dc && (2 * col_temp) >= -col_lendiff)
 	{
@@ -1453,6 +1473,7 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
 	}
       /* Otherwise, print over the existing material. */
       else
+#endif /* !_WIN32 */
 	{
 	  if (temp > 0)
 	    {
@@ -1575,6 +1596,16 @@ _rl_move_cursor_relative (new, data)
      int new;
      const char *data;
 {
+#ifdef _WIN32
+  CONSOLE_SCREEN_BUFFER_INFO     csbi;
+  if ( (_rl_last_c_pos != new)
+       && haveConsole && GetConsoleScreenBufferInfo(hStdout, &csbi) )
+    {
+      csbi.dwCursorPosition.X += new - _rl_last_c_pos;
+      if ( SetConsoleCursorPosition(hStdout, csbi.dwCursorPosition) )
+   _rl_last_c_pos = new;
+    }
+#else /* _WIN32 */
   register int i;
 
   /* If we don't have to do anything, then return. */
@@ -1601,7 +1632,7 @@ _rl_move_cursor_relative (new, data)
   if (new == 0 || CR_FASTER (new, _rl_last_c_pos) ||
       (_rl_term_autowrap && i == _rl_screenwidth))
     {
-#if defined (__MSDOS__)
+#if defined (__MSDOS__) || defined (_WIN32)
       putc ('\r', rl_outstream);
 #else
       tputs (_rl_term_cr, 1, _rl_output_character_function);
@@ -1649,11 +1680,7 @@ _rl_move_cursor_relative (new, data)
 #else /* !HACK_TERMCAP_MOTION */
 
       if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)
-	{
-	  tputs (_rl_term_cr, 1, _rl_output_character_function);
-	  for (i = 0; i < new; i++)
-	    putc (data[i], rl_outstream);
-	}
+	_rl_backspace (_rl_last_c_pos - _rl_col_width (data, 0, new));
       else
 	for (i = _rl_last_c_pos; i < new; i++)
 	  putc (data[i], rl_outstream);
@@ -1681,6 +1708,7 @@ _rl_move_cursor_relative (new, data)
     _rl_last_c_pos =  _rl_col_width (data, 0, new);
   else
     _rl_last_c_pos = new;
+#endif /* !_MINGW32__ */
 }
 
 /* PWP: move the cursor up or down. */
@@ -1688,6 +1716,16 @@ void
 _rl_move_vert (to)
      int to;
 {
+#if defined (_WIN32)
+  CONSOLE_SCREEN_BUFFER_INFO	csbi;
+  if ( (_rl_last_v_pos != to) && (to <= _rl_screenheight)
+       && haveConsole && GetConsoleScreenBufferInfo(hStdout, &csbi) )
+    {
+      csbi.dwCursorPosition.Y += to - _rl_last_v_pos;
+      if ( SetConsoleCursorPosition(hStdout, csbi.dwCursorPosition) )
+	_rl_last_v_pos = to;
+    }
+#else /* !_WIN32 */
   register int delta, i;
 
   if (_rl_last_v_pos == to || to > _rl_screenheight)
@@ -1706,12 +1744,22 @@ _rl_move_vert (to)
     }
   else
     {			/* delta < 0 */
+#ifdef __MSDOS__
+      int row, col;
+
+      fflush (rl_outstream); /* make sure the cursor pos is current! */
+      ScreenGetCursor (&row, &col);
+      ScreenSetCursor (row + delta, col);
+      i = -delta;    /* in case someone wants to use it after the loop */
+#else /* !__MSDOS__ */
       if (_rl_term_up && *_rl_term_up)
 	for (i = 0; i < -delta; i++)
 	  tputs (_rl_term_up, 1, _rl_output_character_function);
+#endif /* !__MSDOS__ */
     }
 
   _rl_last_v_pos = to;		/* Now TO is here */
+#endif /* _WIN32 */
 }
 
 /* Physically print C on rl_outstream.  This is for functions which know
@@ -1932,10 +1980,31 @@ void
 _rl_clear_to_eol (count)
      int count;
 {
+#if defined (_WIN32)
+  CONSOLE_SCREEN_BUFFER_INFO	csbi;
+  if (haveConsole && GetConsoleScreenBufferInfo(hStdout, &csbi))
+    {
+      DWORD written;
+      int linear_pos;
+      
+      linear_pos = (int)csbi.dwCursorPosition.Y * (int)csbi.dwSize.X
+	+ (int)csbi.dwCursorPosition.X;
+      if (linear_pos < rlScreenMax)
+	{
+	  rlScreenEnd = csbi.dwCursorPosition;
+	  rlScreenMax = linear_pos;
+	}
+      FillConsoleOutputCharacter(hStdout, ' ', count, csbi.dwCursorPosition, &written);
+    }
+#else /* !_WIN32 */
+#ifndef __MSDOS__
   if (_rl_term_clreol)
     tputs (_rl_term_clreol, 1, _rl_output_character_function);
-  else if (count)
+  else
+#endif
+  if (count)
     space_to_eol (count);
+#endif /* _WIN32 */
 }
 
 /* Clear to the end of the line using spaces.  COUNT is the minimum
@@ -1944,29 +2013,44 @@ static void
 space_to_eol (count)
      int count;
 {
+#if defined (_WIN32)
+  _rl_clear_to_eol (count);
+#else
   register int i;
 
   for (i = 0; i < count; i++)
    putc (' ', rl_outstream);
 
   _rl_last_c_pos += count;
+#endif /* _WIN32 */
 }
 
 void
 _rl_clear_screen ()
 {
+#if defined (__GO32__)
+  ScreenClear ();	/* FIXME: only works in text modes */
+  ScreenSetCursor (0, 0);  /* term_clrpag is "cl" which homes the cursor */
+#else
+#if !defined (_WIN32)
   if (_rl_term_clrpag)
     tputs (_rl_term_clrpag, 1, _rl_output_character_function);
   else
+#endif /* !_WIN32 */
     rl_crlf ();
+#endif
 }
 
 /* Insert COUNT characters from STRING to the output stream at column COL. */
+#if !defined (_WIN32)
 static void
 insert_some_chars (string, count, col)
      char *string;
      int count, col;
 {
+#ifdef __MSDOS__
+  _rl_output_some_chars (string, count);
+#else  /* !__MSDOS__ */
   /* DEBUGGING */
   if (MB_CUR_MAX == 1 || rl_byte_oriented)
     if (count != col)
@@ -2005,6 +2089,7 @@ insert_some_chars (string, count, col)
       if (_rl_term_ei && *_rl_term_ei)
 	tputs (_rl_term_ei, 1, _rl_output_character_function);
     }
+#endif /* !__MSDOS__ */
 }
 
 /* Delete COUNT characters from the display line. */
@@ -2015,6 +2100,7 @@ delete_chars (count)
   if (count > _rl_screenwidth)	/* XXX */
     return;
 
+#ifndef __MSDOS__
   if (_rl_term_DC && *_rl_term_DC)
     {
       char *buffer;
@@ -2027,7 +2113,9 @@ delete_chars (count)
 	while (count--)
 	  tputs (_rl_term_dc, 1, _rl_output_character_function);
     }
+#endif /* !__MSDOS__ */
 }
+#endif /* !_WIN32 */
 
 void
 _rl_update_final ()
@@ -2064,6 +2152,9 @@ _rl_update_final ()
 static void
 cr ()
 {
+#if defined (_WIN32)
+  _rl_move_cursor_relative (0, 0);
+#else
   if (_rl_term_cr)
     {
 #if defined (__MSDOS__)
@@ -2073,6 +2164,7 @@ cr ()
 #endif
       _rl_last_c_pos = 0;
     }
+#endif /* _WIN32 */
 }
 
 /* Redraw the last line of a multi-line prompt that may possibly contain
@@ -2123,7 +2215,11 @@ _rl_redisplay_after_sigwinch ()
      the right thing happens if we have wrapped to a new screen line. */
   if (_rl_term_cr)
     {
-#if defined (__MSDOS__)
+#if defined (_WIN32)
+      _rl_move_cursor_relative (0, 0);
+      space_to_eol (_rl_screenwidth);
+      _rl_move_cursor_relative (0, 0);
+#elif defined (__MSDOS__)
       putc ('\r', rl_outstream);
 #else
       tputs (_rl_term_cr, 1, _rl_output_character_function);
@@ -2132,7 +2228,7 @@ _rl_redisplay_after_sigwinch ()
 #if defined (__MSDOS__)
       space_to_eol (_rl_screenwidth);
       putc ('\r', rl_outstream);
-#else
+#elif !defined (_WIN32)
       if (_rl_term_clreol)
 	tputs (_rl_term_clreol, 1, _rl_output_character_function);
       else

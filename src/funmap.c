@@ -46,7 +46,7 @@ typedef int QSFUNC (const void *, const void *);
 typedef int QSFUNC ();
 #endif
 
-extern int _rl_qsort_string_compare PARAMS((char **, char **));
+READLINE_DLL_IMPEXP int _rl_qsort_string_compare PARAMS((char **, char **));
 
 FUNMAP **funmap;
 static int funmap_size;
@@ -55,7 +55,9 @@ static int funmap_entry;
 /* After initializing the function map, this is the index of the first
    program specific function. */
 int funmap_program_specific_entry_start;
-
+#ifdef READLINE_DLL_IMPEXP
+# undef READLINE_DLL_IMPEXP      
+#endif /* READLINE_DLL_IMPEXP */
 static FUNMAP default_funmap[] = {
   { "abort", rl_abort },
   { "accept-line", rl_newline },
@@ -111,7 +113,7 @@ static FUNMAP default_funmap[] = {
   { "non-incremental-forward-search-history-again", rl_noninc_forward_search_again },
   { "non-incremental-reverse-search-history-again", rl_noninc_reverse_search_again },
   { "overwrite-mode", rl_overwrite_mode },
-#ifdef __CYGWIN__
+#if defined (__CYGWIN__) || defined (_WIN32)
   { "paste-from-clipboard", rl_paste_from_clipboard },
 #endif
   { "possible-completions", rl_possible_completions },

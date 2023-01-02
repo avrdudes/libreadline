@@ -116,6 +116,7 @@ _rl_init_eightbit ()
     lspec = "";
   t = setlocale (LC_CTYPE, lspec);
 
+#ifndef _WIN32
   if (t && *t && (t[0] != 'C' || t[1]) && (STREQ (t, "POSIX") == 0))
     {
       _rl_meta_flag = 1;
@@ -124,6 +125,7 @@ _rl_init_eightbit ()
       return (1);
     }
   else
+#endif
     return (0);
 
 #else /* !HAVE_SETLOCALE */

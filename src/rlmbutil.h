@@ -1,6 +1,6 @@
 /* rlmbutil.h -- utility functions for multibyte characters. */
 
-/* Copyright (C) 2001 Free Software Foundation, Inc.
+/* Copyright (C) 2001, 2003 Free Software Foundation, Inc.
 
    This file is part of the GNU Readline Library, a library for
    reading lines of text with interactive input and history editing.
@@ -83,19 +83,19 @@
 #define MB_FIND_ANY	0x00
 #define MB_FIND_NONZERO	0x01
 
-extern int _rl_find_prev_mbchar PARAMS((char *, int, int));
-extern int _rl_find_next_mbchar PARAMS((char *, int, int, int));
+READLINE_DLL_IMPEXP int _rl_find_prev_mbchar PARAMS((char *, int, int));
+READLINE_DLL_IMPEXP int _rl_find_next_mbchar PARAMS((char *, int, int, int));
 
 #ifdef HANDLE_MULTIBYTE
 
-extern int _rl_compare_chars PARAMS((char *, int, mbstate_t *, char *, int, mbstate_t *));
-extern int _rl_get_char_len PARAMS((char *, mbstate_t *));
-extern int _rl_adjust_point PARAMS((char *, int, mbstate_t *));
+READLINE_DLL_IMPEXP int _rl_compare_chars PARAMS((char *, int, mbstate_t *, char *, int, mbstate_t *));
+READLINE_DLL_IMPEXP int _rl_get_char_len PARAMS((char *, mbstate_t *));
+READLINE_DLL_IMPEXP int _rl_adjust_point PARAMS((char *, int, mbstate_t *));
 
-extern int _rl_read_mbchar PARAMS((char *, int));
-extern int _rl_read_mbstring PARAMS((int, char *, int));
+READLINE_DLL_IMPEXP int _rl_read_mbchar PARAMS((char *, int));
+READLINE_DLL_IMPEXP int _rl_read_mbstring PARAMS((int, char *, int));
 
-extern int _rl_is_mbchar_matched PARAMS((char *, int, int, char *, int));
+READLINE_DLL_IMPEXP int _rl_is_mbchar_matched PARAMS((char *, int, int, char *, int));
 
 #define MB_INVALIDCH(x)		((x) == (size_t)-1 || (x) == (size_t)-2)
 #define MB_NULLWCH(x)		((x) == 0)
@@ -116,6 +116,6 @@ extern int _rl_is_mbchar_matched PARAMS((char *, int, int, char *, int));
 
 #endif /* !HANDLE_MULTIBYTE */
 
-extern int rl_byte_oriented;
+READLINE_DLL_IMPEXP int rl_byte_oriented;
 
 #endif /* _RL_MBUTIL_H_ */

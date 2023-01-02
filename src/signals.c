@@ -77,8 +77,10 @@ typedef struct { SigHandler *sa_handler; int sa_mask, sa_flags; } sighandler_cxt
 #  define SA_RESTART 0
 #endif
 
+#if !defined (_WIN32)
 static SigHandler *rl_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
 static void rl_maybe_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
+#endif
 
 /* Exported variables for use by applications. */
 
@@ -94,8 +96,11 @@ int rl_catch_sigwinch = 0;	/* for the readline state struct in readline.c */
 #endif
 
 static int signals_set_flag;
+#ifdef SIGWINCH
 static int sigwinch_set_flag;
+#endif
 
+#if !defined (_WIN32)
 /* **************************************************************** */
 /*					        		    */
 /*			   Signal Handling                          */
@@ -361,6 +366,7 @@ rl_clear_signals ()
 
   return 0;
 }
+#endif /* !_WIN32 */
 
 /* Clean up the terminal and readline state after catching a signal, before
    resending it to the calling application. */
@@ -401,4 +407,50 @@ rl_free_line_state ()
   _rl_init_argument ();
 }
 
+#if defined (_WIN32)
+
+#include <windows.h>
+#include <signal.h>
+#include <stdio.h>
+
+/* Handling of CTRL_C_EVENT, CTRL_CLOSE_EVENT, CTRL_BREAK_EVENT, 
+ * CTRL_LOGOFF_EVENT, CTRL_SHUTDOWN_EVENT,
+ * WINDOW_BUFFER_SIZE_EVENTs are handled separately see input.c
+ */
+
+BOOL CtrlEventHandler(DWORD dwEventType)
+{
+  if (dwEventType == CTRL_C_EVENT)
+    rl_free_line_state ();
+  rl_cleanup_after_signal ();
+  if (dwEventType == CTRL_C_EVENT)	/* special treatment */
+    {
+      if (rl_catch_signals == 1)	/* > 1: handled only locally */
+	{
+	  raise(SIGINT);		/* pass to program signal hadler */
+	  rl_reset_after_signal();	/* on return goon */
+	}
+      return TRUE;			/* don't pass to upstream handlers */
+    }
+  return FALSE; 			/* pass other events to handler chain */
+}
+
+int
+rl_set_signals ()
+{
+  if (rl_catch_signals && signals_set_flag == 0)
+    signals_set_flag = SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlEventHandler, TRUE);
+  return signals_set_flag;
+}
+
+int
+rl_clear_signals ()
+{
+  if ( signals_set_flag )
+    if ( SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlEventHandler, FALSE) )
+      signals_set_flag = 0;
+  return signals_set_flag;
+}
+
+#endif	/* _WIN32  */
 #endif  /* HANDLE_SIGNALS */

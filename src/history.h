@@ -68,93 +68,93 @@ typedef struct _hist_state {
 
 /* Begin a session in which the history functions might be used.  This
    just initializes the interactive variables. */
-extern void using_history PARAMS((void));
+READLINE_DLL_IMPEXP void using_history PARAMS((void));
 
 /* Return the current HISTORY_STATE of the history. */
-extern HISTORY_STATE *history_get_history_state PARAMS((void));
+READLINE_DLL_IMPEXP HISTORY_STATE *history_get_history_state PARAMS((void));
 
 /* Set the state of the current history array to STATE. */
-extern void history_set_history_state PARAMS((HISTORY_STATE *));
+READLINE_DLL_IMPEXP void history_set_history_state PARAMS((HISTORY_STATE *));
 
 /* Manage the history list. */
 
 /* Place STRING at the end of the history list.
    The associated data field (if any) is set to NULL. */
-extern void add_history PARAMS((const char *));
+READLINE_DLL_IMPEXP void add_history PARAMS((const char *));
 
 /* Change the timestamp associated with the most recent history entry to
    STRING. */
-extern void add_history_time PARAMS((const char *));
+READLINE_DLL_IMPEXP void add_history_time PARAMS((const char *));
 
 /* A reasonably useless function, only here for completeness.  WHICH
    is the magic number that tells us which element to delete.  The
    elements are numbered from 0. */
-extern HIST_ENTRY *remove_history PARAMS((int));
+READLINE_DLL_IMPEXP HIST_ENTRY *remove_history PARAMS((int));
 
 /* Free the history entry H and return any application-specific data
    associated with it. */
-extern histdata_t free_history_entry PARAMS((HIST_ENTRY *));
+READLINE_DLL_IMPEXP histdata_t free_history_entry PARAMS((HIST_ENTRY *));
 
 /* Make the history entry at WHICH have LINE and DATA.  This returns
    the old entry so you can dispose of the data.  In the case of an
    invalid WHICH, a NULL pointer is returned. */
-extern HIST_ENTRY *replace_history_entry PARAMS((int, const char *, histdata_t));
+READLINE_DLL_IMPEXP HIST_ENTRY *replace_history_entry PARAMS((int, const char *, histdata_t));
 
 /* Clear the history list and start over. */
-extern void clear_history PARAMS((void));
+READLINE_DLL_IMPEXP void clear_history PARAMS((void));
 
 /* Stifle the history list, remembering only MAX number of entries. */
-extern void stifle_history PARAMS((int));
+READLINE_DLL_IMPEXP void stifle_history PARAMS((int));
 
 /* Stop stifling the history.  This returns the previous amount the
    history was stifled by.  The value is positive if the history was
    stifled, negative if it wasn't. */
-extern int unstifle_history PARAMS((void));
+READLINE_DLL_IMPEXP int unstifle_history PARAMS((void));
 
 /* Return 1 if the history is stifled, 0 if it is not. */
-extern int history_is_stifled PARAMS((void));
+READLINE_DLL_IMPEXP int history_is_stifled PARAMS((void));
 
 /* Information about the history list. */
 
 /* Return a NULL terminated array of HIST_ENTRY which is the current input
    history.  Element 0 of this list is the beginning of time.  If there
    is no history, return NULL. */
-extern HIST_ENTRY **history_list PARAMS((void));
+READLINE_DLL_IMPEXP HIST_ENTRY **history_list PARAMS((void));
 
 /* Returns the number which says what history element we are now
    looking at.  */
-extern int where_history PARAMS((void));
+READLINE_DLL_IMPEXP int where_history PARAMS((void));
   
 /* Return the history entry at the current position, as determined by
    history_offset.  If there is no entry there, return a NULL pointer. */
-extern HIST_ENTRY *current_history PARAMS((void));
+READLINE_DLL_IMPEXP HIST_ENTRY *current_history PARAMS((void));
 
 /* Return the history entry which is logically at OFFSET in the history
    array.  OFFSET is relative to history_base. */
-extern HIST_ENTRY *history_get PARAMS((int));
+READLINE_DLL_IMPEXP HIST_ENTRY *history_get PARAMS((int));
 
 /* Return the timestamp associated with the HIST_ENTRY * passed as an
    argument */
-extern time_t history_get_time PARAMS((HIST_ENTRY *));
+READLINE_DLL_IMPEXP time_t history_get_time PARAMS((HIST_ENTRY *));
 
 /* Return the number of bytes that the primary history entries are using.
    This just adds up the lengths of the_history->lines. */
-extern int history_total_bytes PARAMS((void));
+READLINE_DLL_IMPEXP int history_total_bytes PARAMS((void));
 
 /* Moving around the history list. */
 
 /* Set the position in the history list to POS. */
-extern int history_set_pos PARAMS((int));
+READLINE_DLL_IMPEXP int history_set_pos PARAMS((int));
 
 /* Back up history_offset to the previous history entry, and return
    a pointer to that entry.  If there is no previous entry, return
    a NULL pointer. */
-extern HIST_ENTRY *previous_history PARAMS((void));
+READLINE_DLL_IMPEXP HIST_ENTRY *previous_history PARAMS((void));
 
 /* Move history_offset forward to the next item in the input_history,
    and return the a pointer to that entry.  If there is no next entry,
    return a NULL pointer. */
-extern HIST_ENTRY *next_history PARAMS((void));
+READLINE_DLL_IMPEXP HIST_ENTRY *next_history PARAMS((void));
 
 /* Searching the history list. */
 
@@ -164,45 +164,45 @@ extern HIST_ENTRY *next_history PARAMS((void));
    current_history () is the history entry, and the value of this function
    is the offset in the line of that history entry that the string was
    found in.  Otherwise, nothing is changed, and a -1 is returned. */
-extern int history_search PARAMS((const char *, int));
+READLINE_DLL_IMPEXP int history_search PARAMS((const char *, int));
 
 /* Search the history for STRING, starting at history_offset.
    The search is anchored: matching lines must begin with string.
    DIRECTION is as in history_search(). */
-extern int history_search_prefix PARAMS((const char *, int));
+READLINE_DLL_IMPEXP int history_search_prefix PARAMS((const char *, int));
 
 /* Search for STRING in the history list, starting at POS, an
    absolute index into the list.  DIR, if negative, says to search
    backwards from POS, else forwards.
    Returns the absolute index of the history element where STRING
    was found, or -1 otherwise. */
-extern int history_search_pos PARAMS((const char *, int, int));
+READLINE_DLL_IMPEXP int history_search_pos PARAMS((const char *, int, int));
 
 /* Managing the history file. */
 
 /* Add the contents of FILENAME to the history list, a line at a time.
    If FILENAME is NULL, then read from ~/.history.  Returns 0 if
    successful, or errno if not. */
-extern int read_history PARAMS((const char *));
+READLINE_DLL_IMPEXP int read_history PARAMS((const char *));
 
 /* Read a range of lines from FILENAME, adding them to the history list.
    Start reading at the FROM'th line and end at the TO'th.  If FROM
    is zero, start at the beginning.  If TO is less than FROM, read
    until the end of the file.  If FILENAME is NULL, then read from
    ~/.history.  Returns 0 if successful, or errno if not. */
-extern int read_history_range PARAMS((const char *, int, int));
+READLINE_DLL_IMPEXP int read_history_range PARAMS((const char *, int, int));
 
 /* Write the current history to FILENAME.  If FILENAME is NULL,
    then write the history list to ~/.history.  Values returned
    are as in read_history ().  */
-extern int write_history PARAMS((const char *));
+READLINE_DLL_IMPEXP int write_history PARAMS((const char *));
 
 /* Append NELEMENT entries to FILENAME.  The entries appended are from
    the end of the list minus NELEMENTs up to the end of the list. */
-extern int append_history PARAMS((int, const char *));
+READLINE_DLL_IMPEXP int append_history PARAMS((int, const char *));
 
 /* Truncate the history file, leaving only the last NLINES lines. */
-extern int history_truncate_file PARAMS((const char *, int));
+READLINE_DLL_IMPEXP int history_truncate_file PARAMS((const char *, int));
 
 /* History expansion. */
 
@@ -218,12 +218,12 @@ extern int history_truncate_file PARAMS((const char *, int));
 
   If an error ocurred in expansion, then OUTPUT contains a descriptive
   error message. */
-extern int history_expand PARAMS((char *, char **));
+READLINE_DLL_IMPEXP int history_expand PARAMS((char *, char **));
 
 /* Extract a string segment consisting of the FIRST through LAST
    arguments present in STRING.  Arguments are broken up as in
    the shell. */
-extern char *history_arg_extract PARAMS((int, int, const char *));
+READLINE_DLL_IMPEXP char *history_arg_extract PARAMS((int, int, const char *));
 
 /* Return the text of the history event beginning at the current
    offset into STRING.  Pass STRING with *INDEX equal to the
@@ -231,33 +231,33 @@ extern char *history_arg_extract PARAMS((int, int, const char *));
    DELIMITING_QUOTE is a character that is allowed to end the string
    specification for what to search for in addition to the normal
    characters `:', ` ', `\t', `\n', and sometimes `?'. */
-extern char *get_history_event PARAMS((const char *, int *, int));
+READLINE_DLL_IMPEXP char *get_history_event PARAMS((const char *, int *, int));
 
 /* Return an array of tokens, much as the shell might.  The tokens are
    parsed out of STRING. */
-extern char **history_tokenize PARAMS((const char *));
+READLINE_DLL_IMPEXP char **history_tokenize PARAMS((const char *));
 
 /* Exported history variables. */
-extern int history_base;
-extern int history_length;
-extern int history_max_entries;
-extern char history_expansion_char;
-extern char history_subst_char;
-extern char *history_word_delimiters;
-extern char history_comment_char;
-extern char *history_no_expand_chars;
-extern char *history_search_delimiter_chars;
-extern int history_quotes_inhibit_expansion;
+READLINE_DLL_IMPEXP int history_base;
+READLINE_DLL_IMPEXP int history_length;
+READLINE_DLL_IMPEXP int history_max_entries;
+READLINE_DLL_IMPEXP char history_expansion_char;
+READLINE_DLL_IMPEXP char history_subst_char;
+READLINE_DLL_IMPEXP char *history_word_delimiters;
+READLINE_DLL_IMPEXP char history_comment_char;
+READLINE_DLL_IMPEXP char *history_no_expand_chars;
+READLINE_DLL_IMPEXP char *history_search_delimiter_chars;
+READLINE_DLL_IMPEXP int history_quotes_inhibit_expansion;
 
-extern int history_write_timestamps;
+READLINE_DLL_IMPEXP int history_write_timestamps;
 
 /* Backwards compatibility */
-extern int max_input_history;
+READLINE_DLL_IMPEXP int max_input_history;
 
 /* If set, this function is called to decide whether or not a particular
    history expansion should be treated as a special case for the calling
    application and not expanded. */
-extern rl_linebuf_func_t *history_inhibit_expansion_function;
+READLINE_DLL_IMPEXP rl_linebuf_func_t *history_inhibit_expansion_function;
 
 #ifdef __cplusplus
 }

@@ -27,6 +27,7 @@
 #endif
 
 #include <sys/types.h>
+#include <stdio.h>
 
 #if defined (HAVE_UNISTD_H)
 #  include <unistd.h>
@@ -49,7 +50,11 @@
 #endif
 
 #include <fcntl.h>
+#if !defined (_WIN32)
 #include <pwd.h>
+#else /* _WIN32 */
+#include <windows.h>
+#endif /* _WIN32 */
 
 #include <stdio.h>
 
@@ -156,12 +161,16 @@ char *
 sh_get_home_dir ()
 {
   char *home_dir;
+#if !defined (_WIN32)
   struct passwd *entry;
 
   home_dir = (char *)NULL;
   entry = getpwuid (getuid ());
   if (entry)
     home_dir = entry->pw_dir;
+#else
+  home_dir = sh_get_env_value ("HOME");
+#endif /* !_WIN32 */
   return (home_dir);
 }
 
@@ -171,6 +180,7 @@ sh_get_home_dir ()
 #  endif
 #endif
 
+#if !defined (_WIN32)
 int
 sh_unset_nodelay_mode (fd)
      int fd;
@@ -198,3 +208,30 @@ sh_unset_nodelay_mode (fd)
 
   return 0;
 }
+
+#else	/* !_WIN32  */
+
+char *
+_rl_get_user_registry_string (char *keyName, char* valName)
+{
+  char *result = NULL;
+  HKEY	subKey;
+  if ( keyName && (RegOpenKeyEx(HKEY_CURRENT_USER, keyName, 0, KEY_READ, &subKey)
+                   == ERROR_SUCCESS) )
+    {
+      DWORD type;
+      char *chtry = NULL;
+      DWORD bufSize = 0;
+      
+      if ( (RegQueryValueExA(subKey, valName, NULL, &type, chtry, &bufSize)
+	    == ERROR_SUCCESS) && (type == REG_SZ) )
+        {
+	  if ( (chtry = (char *)xmalloc(bufSize))
+	       && (RegQueryValueExA(subKey, valName, NULL, &type, chtry, &bufSize) 
+		   == ERROR_SUCCESS) )
+	    result = chtry;
+        }
+    }
+  return result;
+}
+#endif	/* !_WIN32  */

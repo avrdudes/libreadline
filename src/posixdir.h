@@ -30,6 +30,7 @@
 #  else
 #    define D_NAMLEN(d)   (strlen ((d)->d_name))
 #  endif /* !HAVE_STRUCT_DIRENT_D_NAMLEN */
+#  define FILENAME(d)   ((d)->d_name)
 #else
 #  if defined (HAVE_SYS_NDIR_H)
 #    include <sys/ndir.h>
@@ -44,7 +45,16 @@
 #    define dirent direct
 #  endif /* !dirent */
 #  define D_NAMLEN(d)   ((d)->d_namlen)
+#  define FILENAME(d)   ((d)->d_name)
 #endif /* !HAVE_DIRENT_H */
+
+#if defined (_WIN32)
+# undef FILENAME
+# define FILENAME(d) (d).cFileName
+# define closedir(dir) FindClose (dir)
+# undef D_NAMLEN
+# define D_NAMLEN(d) strlen (d.cFileName)
+#endif
 
 #if defined (HAVE_STRUCT_DIRENT_D_INO) && !defined (HAVE_STRUCT_DIRENT_D_FILENO)
 #  define d_fileno d_ino
