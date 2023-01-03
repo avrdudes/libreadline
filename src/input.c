@@ -538,8 +538,6 @@ int rl_getc (stream)
 
   while ( 1 )
     {
-      DWORD dummy;
-
       if (WaitForSingleObject(hStdin, WAIT_FOR_INPUT) != WAIT_OBJECT_0)
         {
           if ( rl_done )
@@ -550,7 +548,12 @@ int rl_getc (stream)
       if ( haveConsole & FOR_INPUT )
         {
           INPUT_RECORD irec;
-          ReadConsoleInput (hStdin, &irec, 1, &dummy);
+
+          DWORD dwNumberOfEventsRead = 0;
+          BOOL success = ReadConsoleInput (hStdin, &irec, 1, &dwNumberOfEventsRead);
+          if (!success || dwNumberOfEventsRead == 0)
+              return EOF;
+
           switch(irec.EventType)
             {
             case KEY_EVENT:
@@ -615,8 +618,12 @@ int rl_getc (stream)
         }
       else
         {
-          int key;
-          ReadFile(hStdin, &key, 1, &dummy, NULL);
+          char key = 0;
+          DWORD dwNumberOfBytesRead = 0;
+          BOOL success = ReadFile(hStdin, &key, 1, &dwNumberOfBytesRead, NULL);
+          if (!success || dwNumberOfBytesRead == 0)
+              return EOF;
+
           return key;
         }
     }
